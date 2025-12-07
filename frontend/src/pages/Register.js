@@ -1,22 +1,28 @@
 import { useState } from "react";
 
-export default function Register({ onRegistered }) {
-  const [name, setName] = useState("");
+export default function Register({ onSwitch }) {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const registerUser = async () => {
-    const response = await fetch("http://localhost:8080/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, password }),
+      });
 
-    if (response.ok) {
-      alert("Registration successful");
-      onRegistered();
-    } else {
-      alert("Email already exists or error");
+      const json = await res.json();
+
+      if (json && json.id) {
+        alert("Registration successful!");
+        onSwitch(); // go to login
+      } else {
+        alert("Email already exists or invalid input");
+      }
+    } catch {
+      alert("Cannot reach backend");
     }
   };
 
@@ -27,15 +33,17 @@ export default function Register({ onRegistered }) {
 
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Full Name"
           className="w-full mb-3 p-2 border rounded"
-          onChange={(e) => setName(e.target.value)}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
         />
 
         <input
           type="email"
           placeholder="Email"
           className="w-full mb-3 p-2 border rounded"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -43,19 +51,20 @@ export default function Register({ onRegistered }) {
           type="password"
           placeholder="Password"
           className="w-full mb-3 p-2 border rounded"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={registerUser}
-          className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700"
+          className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
         >
           Register
         </button>
 
         <button
-          onClick={onRegistered}
-          className="mt-3 text-blue-600 underline w-full text-center"
+          onClick={onSwitch}
+          className="mt-3 text-blue-600 underline"
         >
           Already have an account? Login
         </button>

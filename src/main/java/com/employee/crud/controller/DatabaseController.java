@@ -1,10 +1,11 @@
 package com.employee.crud.controller;
 
-import com.employee.crud.dto.ApiResponse;
 import com.employee.crud.model.UserDatabase;
 import com.employee.crud.service.DatabaseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -18,17 +19,15 @@ public class DatabaseController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<String> createDb(@RequestParam String name) {
-        String result = service.createDatabase(name);
+    public ResponseEntity<?> createDatabase(@RequestBody Map<String, String> request) {
+        String dbName = request.get("dbName");
+        String result = service.createDatabase(dbName);
 
-        if (result.equals("SUCCESS"))
-            return ApiResponse.ok("Database created");
-
-        return ApiResponse.fail(result);
+        return ResponseEntity.ok(Map.of("status", result));
     }
 
     @GetMapping("/list")
-    public ApiResponse<List<UserDatabase>> listDb() {
-        return ApiResponse.ok(service.listDatabases());
+    public List<UserDatabase> list() {
+        return service.listDatabases();
     }
 }

@@ -1,30 +1,22 @@
-import { useState, useEffect } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import Dashboard from "./Dashboard";
+import { useState } from "react";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
-  const [page, setPage] = useState("login");
+  const [screen, setScreen] = useState("login");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) setPage("dashboard");
-  }, []);
+  const token = localStorage.getItem("token");
 
-  const onLogin = () => setPage("dashboard");
-  const onLogout = () => setPage("login");
+  if (token && screen !== "dashboard") {
+    setScreen("dashboard");
+  }
 
-  return (
-    <>
-      {page === "login" && <Login onLogin={onLogin} onSwitch={() => setPage("register")} />}
+  if (screen === "login")
+    return <Login onLogin={() => setScreen("dashboard")} onSwitch={() => setScreen("register")} />;
 
-      {page === "register" && (
-        <Register onSwitch={() => setPage("login")} />
-      )}
+  if (screen === "register")
+    return <Register onSwitch={() => setScreen("login")} />;
 
-      {page === "dashboard" && (
-        <Dashboard onLogout={onLogout} />
-      )}
-    </>
-  );
+  return <Dashboard onLogout={() => setScreen("login")} />;
 }

@@ -24,11 +24,9 @@ public class TableController {
             @RequestBody Map<String, String> columns) {
 
         String result = service.createTable(db, table, columns);
-
-        if (result.equals("SUCCESS"))
-            return ApiResponse.ok("Table created");
-
-        return ApiResponse.fail(result);
+        return result.equals("SUCCESS") ?
+                ApiResponse.ok("Table created") :
+                ApiResponse.fail(result);
     }
 
     @GetMapping("/list")
@@ -78,5 +76,14 @@ public class TableController {
         return r.equals("SUCCESS") ?
                 ApiResponse.ok("Row deleted") :
                 ApiResponse.fail(r);
+    }
+
+    // ------------ NEW ENDPOINT: GET COLUMNS ------------
+    @GetMapping("/columns")
+    public ApiResponse<List<String>> columns(
+            @RequestParam String db,
+            @RequestParam String table) {
+
+        return ApiResponse.ok(service.getColumns(db, table));
     }
 }

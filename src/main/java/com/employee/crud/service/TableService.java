@@ -30,16 +30,15 @@ public class TableService {
     private boolean userOwnsDb(String dbName) {
         var user = currentUserUtil.getCurrentUser();
         if (user == null) return false;
+
         return userDbRepo.findByUserId(user.getId())
                 .stream()
                 .anyMatch(d -> d.getDatabaseName().equals(dbName));
     }
 
     public String createTable(String dbName, String tableName, Map<String, String> columns) {
-
         if (!validName(dbName) || !validName(tableName)) return "INVALID_NAME";
         if (!userOwnsDb(dbName)) return "NOT_OWNER";
-
         if (columns == null || columns.isEmpty()) return "NO_COLUMNS";
 
         StringBuilder colDef = new StringBuilder();
@@ -77,6 +76,7 @@ public class TableService {
         }
     }
 
+
     public List<String> listTables(String dbName) {
         if (!validName(dbName)) return List.of();
         if (!userOwnsDb(dbName)) return List.of();
@@ -95,6 +95,7 @@ public class TableService {
         return tables;
     }
 
+
     public String dropTable(String dbName, String tableName) {
         if (!validName(dbName) || !validName(tableName)) return "INVALID_NAME";
         if (!userOwnsDb(dbName)) return "NOT_OWNER";
@@ -111,6 +112,7 @@ public class TableService {
             return "ERROR";
         }
     }
+
 
     public String insertRow(String dbName, String tableName, Map<String, Object> row) {
         if (!validName(dbName) || !validName(tableName)) return "INVALID_NAME";
@@ -145,6 +147,7 @@ public class TableService {
         }
     }
 
+
     public List<Map<String, Object>> selectAll(String dbName, String tableName) {
         if (!validName(dbName) || !validName(tableName)) return List.of();
         if (!userOwnsDb(dbName)) return List.of();
@@ -173,8 +176,37 @@ public class TableService {
         return rows;
     }
 
+
+    // ---------------------- NEW: getColumns ----------------------
+    public List<String> getColumns(String dbName, String tableName) {
+        if (!validName(dbName) || !validName(tableName)) return List.of();
+        if (!userOwnsDb(dbName)) return List.of();
+
+        List<String> columns = new ArrayList<>();
+
+        String sql = "SELECT * FROM " + dbName + "." + tableName + " LIMIT 1";
+
+        try (Connection conn = dataSource.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            ResultSetMetaData meta = rs.getMetaData();
+            int colCount = meta.getColumnCount();
+
+            for (int i = 1; i <= colCount; i++) {
+                columns.add(meta.getColumnLabel(i));
+            }
+
+        } catch (Exception ignored) {}
+
+        return columns;
+    }
+
+
     public String deleteRow(String dbName, String tableName, String col, String value) {
-        if (!validName(dbName) || !validName(tableName) || !validName(col)) return "INVALID_NAME";
+        if (!validName(dbName) || !validName(tableName) || !validName(col))
+            return "INVALID_NAME";
+
         if (!userOwnsDb(dbName)) return "NOT_OWNER";
 
         String sql = "DELETE FROM " + dbName + "." + tableName + " WHERE " + col + " = ?";
@@ -184,7 +216,6 @@ public class TableService {
 
             ps.setObject(1, value);
             ps.executeUpdate();
-
             return "SUCCESS";
 
         } catch (Exception e) {
