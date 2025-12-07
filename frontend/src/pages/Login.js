@@ -7,7 +7,7 @@ export default function Login({ onLogin, onSwitch }) {
   const [loading, setLoading] = useState(false);
 
   const loginUser = async (e) => {
-    e?.preventDefault?.();
+    e.preventDefault();
     setLoading(true);
 
     try {
@@ -25,45 +25,43 @@ export default function Login({ onLogin, onSwitch }) {
       } else {
         alert(data.message || "Invalid credentials");
       }
-    } catch (err) {
-      alert("Cannot reach backend. Make sure Spring Boot is running.");
+    } catch {
+      alert("Cannot reach backend. Start Spring Boot.");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+    <div className="min-h-screen bg-[#0e1525] flex justify-center items-center px-4">
       <form
         onSubmit={loginUser}
-        className="bg-white p-6 rounded-lg shadow-lg w-80"
-        autoComplete="off"
+        className="w-full max-w-sm bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 text-white"
       >
-        <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6">Welcome Back</h2>
 
         <input
           type="email"
           placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-4 p-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
-        <div className="relative mb-3">
+        <div className="relative mb-4">
           <input
             type={show ? "text" : "password"}
             placeholder="Password"
-            className="w-full p-2 border rounded pr-10"
+            className="w-full p-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none pr-12"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="absolute right-2 top-2 text-gray-600"
+            className="absolute right-3 top-3 text-white/70 text-xl"
           >
             {show ? "🙈" : "👁️"}
           </button>
@@ -71,19 +69,21 @@ export default function Login({ onLogin, onSwitch }) {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
           disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-semibold shadow-lg transition-all"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <button
-          type="button"
-          onClick={() => onSwitch && onSwitch("register")}
-          className="mt-3 text-blue-600 underline w-full text-center"
-        >
-          New user? Register
-        </button>
+        <p className="text-center mt-4 text-white/70">
+          New here?{" "}
+          <span
+            className="text-blue-400 hover:underline cursor-pointer"
+            onClick={() => onSwitch("register")}
+          >
+            Create an account
+          </span>
+        </p>
       </form>
     </div>
   );
