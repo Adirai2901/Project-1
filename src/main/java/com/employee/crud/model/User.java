@@ -3,6 +3,7 @@ package com.employee.crud.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -20,6 +21,10 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {   // IMPORTANT — REQUIRED
+        this.id = id;
     }
 
     public String getFullName() {
